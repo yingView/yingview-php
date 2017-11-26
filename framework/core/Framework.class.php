@@ -1,6 +1,9 @@
 <?php
     class Framework {
         public static function run() {
+            // 设置主机名字
+            $GLOBALS['localhost'] = 'http://127.0.0.1';
+            
             self :: init();
             self :: autoload();
             self :: dispatch();
@@ -25,6 +28,11 @@
             }
         }
         private static function init() {
+
+            foreach( $_POST as $key => $value) {
+                $_GET[$key] = $value;
+            };
+
             define("DS", DIRECTORY_SEPARATOR);
             define("ROOT", getcwd() . DS);
             define("APP_PATH", ROOT . 'application' . DS);
@@ -33,10 +41,32 @@
             define("CONFIG_PATH", APP_PATH . 'config' . DS);
             define("CONTROLLER_PATH", APP_PATH . 'controllers' . DS);
             define("MODEL_PATH", APP_PATH . 'models' . DS);
-            define("CONTROLLER", isset($_GET['c']) ? ucfirst($_GET['c']) : 'Index');
-            define("ACTION", isset($_GET['a']) ? $_GET['a'] : 'index');
-            define("PLATFORM", isset($_GET['p']) ? $_GET['p'] : 'admin');
+            define('CORE_PATH', FRAMWORK_PATH . 'core' . DS);
+            define('DB_PATH', FRAMWORK_PATH . 'databases' . DS);
+            define('LIB_PATH', FRAMWORK_PATH . 'libraries' . DS);
+            define("CONTROLLER", isset($_GET['rpcname']) ? ucfirst($_GET['rpcname']) : 'Index');
+            define("ACTION", isset($_GET['method']) ? $_GET['method'] : 'index');
+            define("PLATFORM", isset($_GET['p']) ? $_GET['p'] : 'front');
             define("CUR_CONTROLLER_PATH", CONTROLLER_PATH . PLATFORM . DS);
+
+            // 设置跨域
+            header('Access-Control-Allow-Origin:*');
+            // 设置编码
+            header("Content-type: text/html; charset=utf-8");
+            // 引入基础控制器
+            include CORE_PATH . 'Controller.class.php';
+
+            // 引入数据库基础模型
+            include CORE_PATH . 'Model.class.php';
+
+            include LIB_PATH . 'Mail.class.php';
+
+            // 载入数据库配置项
+
+            $GLOBALS['config'] = include CONFIG_PATH . 'config.php';
+            $GLOBALS['mailconfig'] = include CONFIG_PATH . 'mailconfig.php';
+            include DB_PATH . 'Mysql.class.php';
+
         }
     }
 ?>
