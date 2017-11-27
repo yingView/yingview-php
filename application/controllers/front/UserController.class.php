@@ -3,43 +3,43 @@
         // 注册用户名
         public static function registAction(){
 
-            $userinfo = get_object_vars(json_decode($_GET['content']));
-            $userinfo['userid'] = 'null';
-            $userinfo['usercode'] = self::initCode();
-            $userinfo['passcode'] = md5($userinfo['password']);
-            $userinfo['tel'] = 'null';
-            $userinfo['bithday'] = 'null';
-            $userinfo['photoimage'] = $GLOBALS['localhost'] . '/public/uploads/default_photo.jpg';
-            $userinfo['userlevel'] = 1;
-            $userinfo['userpower'] = 1;
-            $userinfo['userstatus'] = 0;
-            $userinfo['jobdesc'] = 'null';
-            $userinfo['activecode'] = self::initCode();
-            $userinfo['usercreatetime'] = time();
+            $userInfo = get_object_vars(json_decode($_GET['content']));
+            $userInfo['userId'] = 'null';
+            $userInfo['userCode'] = self::initCode();
+            $userInfo['passCode'] = md5($userInfo['password']);
+            $userInfo['tel'] = 'null';
+            $userInfo['bithday'] = 'null';
+            $userInfo['photoImage'] = $GLOBALS['localhost'] . '/public/uploads/default_photo.jpg';
+            $userInfo['userLevel'] = 1;
+            $userInfo['userPower'] = 1;
+            $userInfo['userStatus'] = 0;
+            $userInfo['jobDesc'] = 'null';
+            $userInfo['activeCode'] = self::initCode();
+            $userInfo['userCreateTime'] = time();
             $sql = <<<heredoc
             insert into users values(
-                $userinfo[userid],
-                '$userinfo[usercode]',
-                '$userinfo[username]',
-                '$userinfo[password]',
-                '$userinfo[passcode]',
-                '$userinfo[nickname]',
-                $userinfo[sax],
-                '$userinfo[email]',
-                $userinfo[tel],
-                $userinfo[bithday],
-                '$userinfo[photoimage]',
-                $userinfo[userlevel],
-                $userinfo[userpower],
-                $userinfo[userstatus],
-                '$userinfo[userjob]',
-                '$userinfo[jobdesc]',
-                '$userinfo[activecode]',
-                $userinfo[usercreatetime]
+                $userInfo[userId],
+                '$userInfo[userCode]',
+                '$userInfo[userName]',
+                '$userInfo[password]',
+                '$userInfo[passCode]',
+                '$userInfo[nickName]',
+                $userInfo[sax],
+                '$userInfo[email]',
+                $userInfo[tel],
+                $userInfo[bithday],
+                '$userInfo[photoImage]',
+                $userInfo[userLevel],
+                $userInfo[userPower],
+                $userInfo[userStatus],
+                '$userInfo[userJob]',
+                '$userInfo[jobDesc]',
+                '$userInfo[activeCode]',
+                $userInfo[userCreateTime]
             );
 heredoc;
 
-            if (!$userinfo['username'] || !$userinfo['password']) {
+            if (!$userInfo['userName'] || !$userInfo['password']) {
                 self :: setContent(
                     array('isSuccess' => false,
                         'message' => '用户名或密码为空'
@@ -52,20 +52,20 @@ heredoc;
                         array('isSuccess' => true,
                             'message' => '注册成功',
                             'user' => array(
-                                'nickname' => $userinfo['nickname'],
-                                'username' => $userinfo['username'],
-                                'passcode' => $userinfo['passcode'],
-                                'photoimage' => $userinfo['photoimage'],
-                                'usercode' => $userinfo['usercode'],
-                                'userjob' => $userinfo['userjob']
+                                'nickName' => $userInfo['nickName'],
+                                'userName' => $userInfo['userName'],
+                                'passCode' => $userInfo['passCode'],
+                                'photoImage' => $userInfo['photoImage'],
+                                'userCode' => $userInfo['userCode'],
+                                'userJob' => $userInfo['userJob']
                             )
                         )
                     );
                     // 设置session
-                    $_SESSION['userinfo'] = $userinfo;
+                    $_SESSION['userInfo'] = $userInfo;
                     // 发送邮件
-                    $to = $userinfo['email'];
-                    $activeAddr = "{$GLOBALS[localhost]}?rpcname=user&method=active&username=$userinfo[username]&activecode=$userinfo[activecode]";
+                    $to = $userInfo['email'];
+                    $activeAddr = "{$GLOBALS[localhost]}?rpcname=user&method=active&userName=$userInfo[userName]&activeCode=$userInfo[activeCode]";
                     $body = <<<MailContent
                     <table height='100%' width='100%' cellpadding='0' cellspacing='0' border='0'>
                     <tbody>
@@ -153,15 +153,15 @@ MailContent;
 
         // 激活用户
         public static function activeAction(){
-            $username = $_GET['username'];
-            $activecode = $_GET['activecode'];
-            if (!$username || !$activecode) {
+            $userName = $_GET['userName'];
+            $activeCode = $_GET['activeCode'];
+            if (!$userName || !$activeCode) {
                 echo '激活失败！';
                 return;
             }
             $mysql = new Mysql($GLOBALS['config']);
-            if ( $mysql -> getRow("select * from users where username='$username' and userstatus=0 and activecode='$activecode'")) {
-                $sql = "update users set activecode=null,userstatus=1 where username='$username' and userstatus=0 and activecode='$activecode'";
+            if ( $mysql -> getRow("select * from users where userName='$userName' and userStatus=0 and activeCode='$activeCode'")) {
+                $sql = "update users set activeCode=null,userStatus=1 where userName='$userName' and userStatus=0 and activeCode='$activeCode'";
                 if ($mysql -> query($sql)) {
                     echo '激活成功';
                 } else {
@@ -173,9 +173,9 @@ MailContent;
         }
         // 用户登录
         public static function loginAction(){
-            $username = $_GET['username'];
+            $userName = $_GET['userName'];
             $password = $_GET['password'];
-            if (!$username || !$password) {
+            if (!$userName || !$password) {
                 self :: setContent(
                     array('isSuccess' => false,
                         'message' => '请填写用户名或密码'
@@ -183,19 +183,19 @@ MailContent;
                 );
             } else {
                 $mysql = new Mysql($GLOBALS['config']);
-                $sql = "select * from users where username='$username' and password='$password'";
-                $userinfo = $mysql -> getRow($sql);
-                if ( $userinfo ) {
+                $sql = "select * from users where userName='$userName' and password='$password'";
+                $userInfo = $mysql -> getRow($sql);
+                if ( $userInfo ) {
                     self :: setContent(
                         array('isSuccess' => true,
                             'message' => '登录成功',
                             'user' => array(
-                                'nickname' => $userinfo['nickname'],
-                                'username' => $userinfo['username'],
-                                'passcode' => $userinfo['passcode'],
-                                'photoimage' => $userinfo['photoimage'],
-                                'usercode' => $userinfo['usercode'],
-                                'userjob' => $userinfo['userjob']
+                                'nickName' => $userInfo['nickName'],
+                                'userName' => $userInfo['userName'],
+                                'passCode' => $userInfo['passCode'],
+                                'photoImage' => $userInfo['photoImage'],
+                                'userCode' => $userInfo['userCode'],
+                                'userJob' => $userInfo['userJob']
                             )
                         )
                     );
@@ -211,7 +211,7 @@ MailContent;
         }
         // 用户退出
         public static function logoutAction(){
-            if (isset($_SESSION['userinfo'])) {
+            if (isset($_SESSION['userInfo'])) {
                 session_destroy();
             }
         }

@@ -3,7 +3,8 @@
         public static function run() {
             // 设置主机名字
             $GLOBALS['localhost'] = 'http://127.0.0.1';
-            
+            // 设置时区;
+            ini_set('date.timezone','Asia/Shanghai');
             self :: init();
             self :: autoload();
             self :: dispatch();
@@ -48,7 +49,8 @@
             define("ACTION", isset($_GET['method']) ? $_GET['method'] : 'index');
             define("PLATFORM", isset($_GET['p']) ? $_GET['p'] : 'front');
             define("CUR_CONTROLLER_PATH", CONTROLLER_PATH . PLATFORM . DS);
-
+            define("UPLOAD_PATH", PUBLIC_PATH . 'uploads' . DS);
+ 
             // 设置跨域
             header('Access-Control-Allow-Origin:*');
             // 设置编码
@@ -58,8 +60,10 @@
 
             // 引入数据库基础模型
             include CORE_PATH . 'Model.class.php';
-
+            // 邮件发送
             include LIB_PATH . 'Mail.class.php';
+            // 上传附件
+            include LIB_PATH . 'Upload.class.php';
 
             // 载入数据库配置项
 
