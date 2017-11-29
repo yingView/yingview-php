@@ -16,8 +16,8 @@ class Mysql{
 		$port = isset($config['port'])? $config['port'] : '3306';
 		$charset = isset($config['charset'])? $config['charset'] : 'utf8';
 		
-		$this->conn = mysql_connect("$host:$port",$user,$password) or die('数据库连接错误');
-		mysql_select_db($dbname) or die('数据库选择错误');
+		$this->conn = mysqli_connect("$host:$port",$user,$password,$dbname) or die('数据库连接错误');
+		// mysqli_select_db($dbname) or die('数据库选择错误');
 		$this->setChar($charset);
 	}
 
@@ -39,7 +39,7 @@ class Mysql{
 	 */
 	public function query($sql){		
 		$this->sql = $sql;
-		$result = @mysql_query($this->sql,$this->conn);
+		$result = @mysqli_query($this->conn, $this->sql);
 		
 		// if (! $result) {
 		// 	die($this->errno().':'.$this->error().'<br />出错语句为'.$this->sql.'<br />');
@@ -55,7 +55,7 @@ class Mysql{
 	 */
 	public function getOne($sql){
 		$result = $this->query($sql);
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		if ($row) {
 			return $row[0];
 		} else {
@@ -71,7 +71,7 @@ class Mysql{
 	 */
 	public function getRow($sql){
 		if ($result = $this->query($sql)) {
-			$row = mysql_fetch_assoc($result);
+			$row = mysqli_fetch_assoc($result);
 			return $row;
 		} else {
 			return false;
@@ -87,7 +87,7 @@ class Mysql{
 	public function getAll($sql){
 		$result = $this->query($sql);
 		$list = array();
-		while ($row = mysql_fetch_assoc($result)){
+		while ($row = mysqli_fetch_assoc($result)){
 			$list[] = $row;
 		}
 		return $list;
@@ -102,7 +102,7 @@ class Mysql{
 	public function getCol($sql){
 		$result = $this->query($sql);
 		$list = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$list[] = $row[0];
 		}
 		return $list;
@@ -113,7 +113,7 @@ class Mysql{
 	 * 获取上一步insert操作产生的id
 	 */
 	public function getInsertId(){
-		return mysql_insert_id($this->conn);
+		return mysqli_insert_id($this->conn);
 	}
 	/**
 	 * 获取错误号
@@ -121,7 +121,7 @@ class Mysql{
 	 * @return 错误号
 	 */
 	public function errno(){
-		return mysql_errno($this->conn);
+		return mysqli_errno($this->conn);
 	}
 
 	/**
@@ -130,7 +130,7 @@ class Mysql{
 	 * @return 错误private信息
 	 */
 	public function error(){
-		return mysql_error($this->conn);
+		return mysqli_error($this->conn);
 	}
 
 }

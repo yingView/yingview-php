@@ -1,6 +1,7 @@
 <?php
 class Image{
-	private $thumbPrefix = 'thumb_'; //缩略图前缀
+	// private $thumbPrefix = 'thumb_'; //缩略图前缀
+	private $thumbPrefix = '';
 	private $waterPrefix = 'water_'; //水印图片前缀
 
 	//图片类型和对应创建画布资源的函数名

@@ -58,24 +58,30 @@
                 self :: send();
                 return;
             }
-            $folder = 'content';
+            $folder = 'contents';
             if ($_POST['type'] === "0") {
-                $folder = 'photo'; // 头像
+                $folder = 'photos'; // 头像
             } else if ($_POST['type'] === '1') {
-                $folder = 'cover'; // 封面
+                $folder = 'covers'; // 封面
             } else if ($_POST['type'] === '2') {
-                $folder = 'content'; // 文章
+                $folder = 'contents'; // 文章
             }
 
             $upload = new Upload();
             $filename = $upload->multiUp($_FILES['files'], $folder);
             if ($filename) {
                 $sql = "insert into files values ";
+                $lastShowTime = time();
                 foreach($filename as $indx => $value) {
                     if (!$indx) {
-                        $sql .= "(null, '$value[fileCode]','$value[fileName]',$_POST[type],'$value[url]','$_POST[userCode]','$value[mime]')";
+                        $sql .= "(null, '$value[fileCode]','$value[fileName]',$_POST[type],'$value[url]','$_POST[userCode]','$value[mime]', $lastShowTime)";
                     } else {
-                        $sql .= ",(null, '$value[fileCode]','$value[fileName]',$_POST[type],'$value[url]','$_POST[userCode]','$value[mime]')";
+                        $sql .= ",(null, '$value[fileCode]','$value[fileName]',$_POST[type],'$value[url]','$_POST[userCode]','$value[mime]', $lastShowTime)";
+                    }
+                    if($_POST['type'] === '1') { // 如果上传的文件是头像，则进行压缩 和删除原图片 采用替换
+                        $img = new Image();
+                        $img->thumbnail(ROOT.$value['url'],290,180, UPLOAD_PATH."$folder/");
+                        // unlink(UPLOAD_PATH . UPLOAD_PATH."$folder/$value[fileName]");
                     }
                 };
                 $mysql = new Mysql($GLOBALS['config']);
@@ -103,17 +109,50 @@
                         'message' => '上传失败'
                     )
                 );
-            }
-
-            // `fileId` int PRIMARY KEY AUTO_INCREMENT,
-            // `filesCode` varchar(64) NOT NULL,
-            // `filesName` varchar(70) NOT NULL,
-            // `type` TINYINT, /* 0 代表头像 1，代表封面，2、代表文章*/
-            // `url` varchar(500) NOT NULL, /* 访问路径 */
-            // `userCode` varchar(64) NOT NULL,
-            // `filesMime` varchar(16)            
+            }           
             self :: send();
         }
 
+        // public static function MiniImageAction(){ // 压缩图片
+        //     $fileCode = $_GET['fileCode'];
+        //     if (!$fileCode) {
+        //         return;
+        //     }
+        //     $mysql = new Mysql($GLOBALS['config']);
+        //     $file = $mysql -> getRow("select * from files where filesCode='$fileCode'");
+        //     if ($file) {
+        //         header('Content-type:image/png');
+        //         $lastShowTime = time();
+        //         $mysql -> query("update users set lastShowTime=$lastShowTime where filesCode='$fileCode'");
+        //         if (!is_file(UPLOAD_PATH . "thumb_$file[filesName]")) {
+        //             $img = new Image();
+        //             $img->thumbnail(ROOT.$file['url'],290,180, UPLOAD_PATH);
+        //         }
+        //         $str = file_get_contents(UPLOAD_PATH . "thumb_$file[filesName]");
+        //         echo $str;
+        //     };
+        // }
+
+        public static function DownLoadAction(){
+            $fileCode = $_GET['fileCode'];
+            if (!$fileCode) {
+                return;
+            }
+            $mysql = new Mysql($GLOBALS['config']);
+            $file = $mysql -> getRow("select * from files where filesCode='$fileCode'");
+            if ($file) {
+                header('Content-type:image/png');
+                $lastShowTime = time();
+                $mysql -> query("update users set lastShowTime=$lastShowTime where filesCode='$fileCode'");
+                // 下载附件
+                echo 123;
+            };
+        }
+
+        public static function GetCaptchaAction(){
+            $c = new Captcha();
+            $c->generateCode();
+            $_SESSION['captcha'] = $c->getCode();
+        }
     }
 ?>

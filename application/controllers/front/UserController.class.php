@@ -9,7 +9,7 @@
             $userInfo['passCode'] = md5($userInfo['password']);
             $userInfo['tel'] = 'null';
             $userInfo['bithday'] = 'null';
-            $userInfo['photoImage'] = $GLOBALS['localhost'] . '/public/uploads/default_photo.jpg';
+            $userInfo['photoImage'] = FRONT_UPLOAD_PHOTO_PATH . 'default_photo.jpg';
             $userInfo['userLevel'] = 1;
             $userInfo['userPower'] = 1;
             $userInfo['userStatus'] = 0;
@@ -175,7 +175,19 @@ MailContent;
         public static function loginAction(){
             $userName = $_GET['userName'];
             $password = $_GET['password'];
-            if (!$userName || !$password) {
+            $captcha = $_GET['captcha'];
+            if (strtolower($_SESSION['captcha']) != strtolower($captcha) && $_SESSION['captchaIdx'] >= 3) {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '验证码不正确'
+                    )
+                );
+            } else if (!$userName || !$password) {
+                $captchaIdx = 1;
+                if ($_SESSION['captchaIdx']) {
+                    $captchaIdx = $_SESSION['captchaIdx'] + 1;
+                }
+                $_SESSION['captchaIdx'] = $captchaIdx;
                 self :: setContent(
                     array('isSuccess' => false,
                         'message' => '请填写用户名或密码'
@@ -186,6 +198,7 @@ MailContent;
                 $sql = "select * from users where userName='$userName' and password='$password'";
                 $userInfo = $mysql -> getRow($sql);
                 if ( $userInfo ) {
+                    $_SESSION['userInfo'] = $userInfo;
                     self :: setContent(
                         array('isSuccess' => true,
                             'message' => '登录成功',
@@ -212,7 +225,8 @@ MailContent;
         // 用户退出
         public static function logoutAction(){
             if (isset($_SESSION['userInfo'])) {
-                session_destroy();
+                unset($_SESSION['userInfo']);
+                unset($_SESSION['captcha']);
             }
         }
     }

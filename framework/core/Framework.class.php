@@ -5,6 +5,10 @@
             $GLOBALS['localhost'] = 'http://127.0.0.1';
             // 设置时区;
             ini_set('date.timezone','Asia/Shanghai');
+            // 开启session
+            session_start();
+            // 关闭警告
+            error_reporting(0);
             self :: init();
             self :: autoload();
             self :: dispatch();
@@ -50,6 +54,10 @@
             define("PLATFORM", isset($_GET['p']) ? $_GET['p'] : 'front');
             define("CUR_CONTROLLER_PATH", CONTROLLER_PATH . PLATFORM . DS);
             define("UPLOAD_PATH", PUBLIC_PATH . 'uploads' . DS);
+            define("FRONT_UPLOAD_PATH",  '/public/uploads' . DS);
+            define("FRONT_UPLOAD_COVER_PATH", '/public/uploads/covers' . DS);
+            define("FRONT_UPLOAD_CONTENT_PATH", '/public/uploads/contents' . DS);
+            define("FRONT_UPLOAD_PHOTO_PATH", '/public/uploads/photos' . DS);
  
             // 设置跨域
             header('Access-Control-Allow-Origin:*');
@@ -64,6 +72,10 @@
             include LIB_PATH . 'Mail.class.php';
             // 上传附件
             include LIB_PATH . 'Upload.class.php';
+            // 缩略图和水印
+            include LIB_PATH . 'Image.class.php';
+            // 添加验证码
+            include LIB_PATH . 'Captcha.class.php';
 
             // 载入数据库配置项
 

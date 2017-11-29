@@ -71,20 +71,20 @@ class Upload{
 					'fileCode' => $name,
 					'fileName' => $file_name,
 					'mime' => explode('.', $filemime)[1],
-					'url' => '/public/uploads/' . $sub_path . $file_name
+					'url' =>  FRONT_UPLOAD_PATH . $sub_path . $file_name,
+					// 'mineImage' => "/yingview.php?fileCode={$name}&method=miniImage",
+					'download' => "/yingview.php?fileCode={$name}&method=downLoad"
 				);
 			} else {
 				# 移动失败
 				$this->errno = -3;
 				return false;
 			}
-
 		} else {
 			# 上传到临时文件夹失败，根据其错误号设置错误号
 			$this->errno = $file['error'];
 			return false;
 		}
-		
 	}
 
 	/**

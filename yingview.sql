@@ -71,7 +71,8 @@ CREATE TABLE `files` ( /*附件*/
 	`type` TINYINT, /* 0 代表头像 1，代表封面，2、代表文章*/
 	`url` varchar(500) NOT NULL, /* 访问路径 */
 	`userCode` varchar(64) NOT NULL,
-	`filesMime` varchar(16)
+	`filesMime` varchar(16),
+	`laseShowTime` int
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table files;
@@ -80,35 +81,49 @@ CREATE TABLE `articals` ( /*文章*/
 	`articalId` int PRIMARY KEY AUTO_INCREMENT,
 	`articalCode` varchar(64) NOT NULL,
 	`articalTitle` varchar(60) NOT NULL,
-	`userId` int DEFAULT NULL,
-	`categoryId` int DEFAULT NULL,
+	`userCode` varchar(64) DEFAULT NULL,
+	`categoryCode` varchar(64) DEFAULT NULL,
 	`articalContent` varchar(20000) DEFAULT NULL,
 	`articalPhoto` varchar(80) DEFAULT NULL, /* 封面图片 */
-	`articalImages` varchar(1600) DEFAULT NULL, /* 图片地址 */
+	`articalImages` varchar(1500) DEFAULT NULL, /* 图片地址 */
 	`articalCreateDate` int DEFAULT 0, 
-	`articalType` tinyint DEFAULT 0, /* 文章或是图片 0 ，1 */
+	`articalType` tinyint DEFAULT 0, /* 文章或是图片或是专栏文章 0 ，1 , 2 */
 	`articalView` int DEFAULT 0,  /* 点击数 */
-	`articalMark` int DEFAULT 0,  /* 查看数 */
+	`articalMark` int DEFAULT 0,  /* 点赞数 */
 	`articalCommentNum` int DEFAULT 0, /* 评论数 */
 	`articalStatus` tinyint DEFAULT 0, /* 0，保存，1，发布，状态为2则为精品*/
-	`bookId` int DEFAULT NULL /* 专栏id */
+	`bookId` int DEFAULT NULL /* 专栏id 专栏文章photo和type取book得photo和type*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into articals values(null,'2123131233213','测试', 1,1,13123123,'http://127.0.0.1:8080/files/23D31E0AAE3D4EC9BD46B66F71961A82.jpg',null,14212331343543,'artical', 143,4536,3321,1);
+
+insert into articals values(null,'2123131233213','测试', 1,1,13123123,'http://127.0.0.1:8080/files/23D31E0AAE3D4EC9BD46B66F71961A82.jpg',null,14212331343543,'artical', 143,4536,3321,1, 1);
+
+insert into articals values ( null, '50551427efc6daf174f0afb494aff8af', '21', '543e8e89ce8485efe5c11746c7d7fc35', 1, '徐志飞测试徐志飞测试2', '201711281915225a1d454a1ee7d', '', 1511867857, 0, 0, 0, 0, 1);
+
+drop table articals;
 
 select count(*) from articals;
 
 /* 联合查询 */
-select articals.*, users.* from articals left join users on articals.userId = users.userId;
+select articals.*, users.* from articals left join users on articals.userCode = users.userCode where articalStatus = 1 order by articalCreateDate desc limit 4;
 
 CREATE TABLE `books` (  /* 专栏 */
 	`bookId` int PRIMARY KEY AUTO_INCREMENT,
 	`bookCode` varchar(64) NOT NULL,
+	`bookPhoto` varchar(80) DEFAULT NULL, /* 封面图片 */
 	`bookName` varchar(30) NOT NULL,
-	`userId` int,
-	`bookStatus` tinyint
+	`categoryCode` int DEFAULT NULL,
+	`userCode` varchar(64) NOT NULL,
+	`bookView` int DEFAULT 0,  /* 点击数 */
+	`bookMark` int DEFAULT 0,  /* 点赞数 */
+	`bookCommentNum` int DEFAULT 0, /* 评论数 */
+	`bookCreateDate` int DEFAULT 0,
+	`bookStatus` tinyint /* 普通，新品，推荐，精品 0， 1， 2， 3*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+insert into books values( null, 1 ,'首页', '/', 1, 0, 0, '_blank');
+
+drop table books;
 
 CREATE TABLE `categorys` (  /*分类*/
 	`categoryId` int PRIMARY KEY AUTO_INCREMENT,
@@ -122,14 +137,20 @@ insert into categorys values( null, "1", '分类1', 0, 1);
 insert into categorys values( null, "2", '分类2', 0, 1);
 insert into categorys values( null, "3", '分类3', 0, 1);
 
+drop table categorys;
+
 CREATE TABLE `comments` ( /*评论*/
 	`commentId` int PRIMARY KEY AUTO_INCREMENT,
-	`articalId` int,
-	`userId` int,
+	`commentCode` varchar(64) NOT NULL,
+	`articalCode` varchar(64) NOT NULL,
+	`userCode` varchar(64) NOT NULL,
+	`bookCode` varchar(64) NOT NULL,
 	`comContent` varchar(400), /*200字数*/
-	`comCreateDate` date DEFAULT NULL,
+	`comCreateDate` int,
 	`comParentType` tinyint, /* 主体是文章还是评论   0 ， 1 */
-	`comParentId` int, /* 主体id */
+	`comParentCode` varchar(64) NOT NULL, /* 主体 code */
 	`comMark` int DEFAULT NULL, /* 点赞数 */
 	`comCommentNum` int   /* 评论数 */
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table comments;
