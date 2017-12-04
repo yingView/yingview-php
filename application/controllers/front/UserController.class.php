@@ -9,7 +9,7 @@
             $userInfo['passCode'] = md5($userInfo['password']);
             $userInfo['tel'] = 'null';
             $userInfo['bithday'] = 'null';
-            $userInfo['photoImage'] = FRONT_UPLOAD_PHOTO_PATH . 'default_photo.jpg';
+            $userInfo['photoImage'] = 'default_photo.jpg';
             $userInfo['userLevel'] = 1;
             $userInfo['userPower'] = 1;
             $userInfo['userStatus'] = 0;
@@ -55,7 +55,7 @@ heredoc;
                                 'nickName' => $userInfo['nickName'],
                                 'userName' => $userInfo['userName'],
                                 'passCode' => $userInfo['passCode'],
-                                'photoImage' => $userInfo['photoImage'],
+                                'photoImage' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['photoImage'],
                                 'userCode' => $userInfo['userCode'],
                                 'userJob' => $userInfo['userJob']
                             )
@@ -206,7 +206,7 @@ MailContent;
                                 'nickName' => $userInfo['nickName'],
                                 'userName' => $userInfo['userName'],
                                 'passCode' => $userInfo['passCode'],
-                                'photoImage' => $userInfo['photoImage'],
+                                'photoImage' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['photoImage'],
                                 'userCode' => $userInfo['userCode'],
                                 'userJob' => $userInfo['userJob']
                             )
@@ -228,6 +228,54 @@ MailContent;
                 unset($_SESSION['userInfo']);
                 unset($_SESSION['captcha']);
             }
+        }
+
+        // 关注
+        public static function followAction(){
+            $followUserCode = $_GET['followUserCode'];
+            $visitorCode = $_GET['visitorCode'];
+            if ($followUserCode === $visitorCode) {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '你不能关注自己'
+                    )
+                );
+            } else {
+                $mysql = new Mysql($GLOBALS['config']);
+                $sql = "select * from userFollow where followUserCode='$followUserCode' and visitorCode='$visitorCode'";
+                if (!$mysql -> getAll($sql)) {
+                    $createDate = time();
+                    $followId = 'null';
+                    $followCode = self::initCode();
+                    $sql = "insert into userFollow values (
+                        $followId,
+                        '$followCode',
+                        '$followUserCode',
+                        '$visitorCode',
+                        $createDate
+                    )";
+                    if ($mysql -> query($sql)) {
+                        self :: setContent(
+                            array('isSuccess' => true,
+                            'message' => '操作成功'
+                            )
+                        );
+                    } else {
+                        self :: setContent(
+                            array('isSuccess' => true,
+                            'message' => '操作失败'
+                            )
+                        );
+                    }
+                } else {
+                    self :: setContent(
+                        array('isSuccess' => false,
+                        'message' => '你已经关注过该用户'
+                        )
+                    );
+                }
+            }
+            self :: send();
         }
     }
 ?>

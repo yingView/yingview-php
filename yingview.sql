@@ -95,7 +95,6 @@ CREATE TABLE `articals` ( /*文章*/
 	`bookId` int DEFAULT NULL /* 专栏id 专栏文章photo和type取book得photo和type*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 insert into articals values(null,'2123131233213','测试', 1,1,13123123,'http://127.0.0.1:8080/files/23D31E0AAE3D4EC9BD46B66F71961A82.jpg',null,14212331343543,'artical', 143,4536,3321,1, 1);
 
 insert into articals values ( null, '50551427efc6daf174f0afb494aff8af', '21', '543e8e89ce8485efe5c11746c7d7fc35', 1, '徐志飞测试徐志飞测试2', '201711281915225a1d454a1ee7d', '', 1511867857, 0, 0, 0, 0, 1);
@@ -106,6 +105,52 @@ select count(*) from articals;
 
 /* 联合查询 */
 select articals.*, users.* from articals left join users on articals.userCode = users.userCode where articalStatus = 1 order by articalCreateDate desc limit 4;
+
+
+CREATE TABLE `articalMarks` ( /*点赞列表*/
+	`markId` int PRIMARY KEY AUTO_INCREMENT,
+	`markCode` varchar(64) NOT NULL,
+	`articalCode` varchar(64) NOT NULL,
+	`userCode` varchar(64) DEFAULT NULL,
+	`createDate` int DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table articalMarks;
+
+CREATE TABLE `articalViews` ( /*查看列表*/
+	`viewId` int PRIMARY KEY AUTO_INCREMENT,
+	`viewCode` varchar(64) NOT NULL,
+	`articalCode` varchar(64) NOT NULL,
+	`visitorIp` varchar(32) DEFAULT NULL,
+	`createDate` int DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+select * from articalViews;
+
+
+drop table articalViews;
+
+CREATE TABLE `userFollow` ( /*关注列表*/
+	`followId` int PRIMARY KEY AUTO_INCREMENT,
+	`followCode` varchar(64) NOT NULL,
+	`followUserCode` varchar(64) DEFAULT NULL, /*被关注人*/
+	`visitorCode` varchar(64) DEFAULT NULL,
+	`createDate` int DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table userFollow;
+
+CREATE TABLE `emails` ( /*站内信*/
+	`emailId` int PRIMARY KEY AUTO_INCREMENT,
+	`emailCode` varchar(64) NOT NULL,
+	`sendUserCode` varchar(64) DEFAULT NULL, /*被关注人*/
+	`ReceiveUserCode` varchar(64) DEFAULT NULL,
+	`eamilTitle` varchar(100) DEFAULT NULL,
+	`eamilContent` varchar(2000) DEFAULT NULL,
+	`emailCreateDate` int DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table emails;
 
 CREATE TABLE `books` (  /* 专栏 */
 	`bookId` int PRIMARY KEY AUTO_INCREMENT,
@@ -154,3 +199,13 @@ CREATE TABLE `comments` ( /*评论*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table comments;
+
+CREATE TABLE `commentMarks` ( /*评论点赞列表*/
+	`commentMarkId` int PRIMARY KEY AUTO_INCREMENT,
+	`commentMarkCode` varchar(64) NOT NULL,
+	`commentCode` varchar(64) NOT NULL,
+	`userCode` varchar(64) DEFAULT NULL,
+	`createDate` int DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table articalMarks;
