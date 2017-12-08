@@ -1,6 +1,7 @@
 <?php
     class ArticalController extends Controller  {
-        public static function EditAction() {
+
+        public static function editAction() {
             if (!$_GET['content']) {
                 self :: setContent(
                     array('isSuccess' => false,
@@ -10,7 +11,6 @@
                 self :: send();
                 return;
             }
-            
             $operate = $_GET['operate'];
             $articalInfo = get_object_vars(json_decode($_GET['content']));
             $articalId = 'null';
@@ -84,7 +84,7 @@
         }
         
         // 查询所有 通过 type new hot
-        public static function ArticalQueryAction() {
+        public static function articalQueryAction() {
             if ($_GET['size'] === 'null') {
                 $_GET['size'] = 40;
             };
@@ -118,8 +118,8 @@
             self :: send();
         }
 
-        // 查询详情 或者 编辑 通过 articalCode
-        public static function QueryAction() {
+        // 查询list 通过 needType
+        public static function queryAction() {
             $needType = $_GET['needType'];
             $current = $_GET['current'];
             $size = $_GET['size'];
@@ -163,7 +163,7 @@
                     'articalStatus' => $artical['articalStatus'],
                     'userCode' => $artical['userCode'],
                     'userName' => $artical['userName'],
-                    'photoImage' => FRONT_UPLOAD_PHOTO_PATH . $artical['photoImage'],
+                    'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $artical['userPhoto'],
                     'nickName' => $artical['nickName'],
                     'sax' => $artical['sax'],
                     'userLevel' => $artical['userLevel'],
@@ -175,7 +175,7 @@
             };
             return array('articalList' => $articalList, 'total' => $total, 'current' => $current + 1, 'size' => $size);
         }
-        public static function GetArticalByCodeAction() {
+        public static function getArticalByCodeAction() {
             $articalCode = $_GET['articalCode'];
             $sql = "select articals.*, users.* from articals left join users on articals.userCode = users.userCode where articalStatus != 0 and articalCode='$articalCode'";
             $mysql = new Mysql($GLOBALS['config']);
@@ -212,7 +212,7 @@
                             'articalStatus' => $artical['articalStatus'],
                             'userCode' => $artical['userCode'],
                             'userName' => $artical['userName'],
-                            'photoImage' => FRONT_UPLOAD_PHOTO_PATH . $artical['photoImage'],
+                            'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $artical['userPhoto'],
                             'nickName' => $artical['nickName'],
                             'sax' => $artical['sax'],
                             'userLevel' => $artical['userLevel'],
@@ -290,6 +290,95 @@
                     $mysql -> query($sql);
                     self :: setContent(
                         array('isSuccess' => true,
+                            'message' => '操作成功'
+                        )
+                    );
+                } else {
+                    self :: setContent(
+                        array('isSuccess' => false,
+                            'message' => '操作失败'
+                        )
+                    );
+                }
+            } else {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '操作失败'
+                    )
+                );
+            }
+            self :: send();
+        }
+
+        public static function getArticalListByUserCodeAction() {
+            $userCode = $_GET['userCode'];
+            $self = $_GET['self'];
+            $current = $_GET['current'];
+            $size = $_GET['size'];
+            $total = 0;
+            if ($current === null) {
+                $current = 1;
+            }
+            if ($size === null) {
+                $size = 10;
+            }
+            $mysql = new Mysql($GLOBALS['config']);
+            $sql = "select * from articals where userCode='$userCode' and articalType != 2 ";
+            if ($self != 'true') {
+                $sql .= "and articalStatus != 0";
+            }
+            $total = count($mysql -> getAll($sql));
+            $current = ($current - 1) * $size;
+            $sql.=" limit $current ,$size";
+            $articalList = $mysql -> getAll($sql);
+            if ($articalList) {
+                $copy = array();
+                foreach($articalList as $key => $value) {
+                    $value['articalPhoto'] = array(
+                        'url' => FRONT_UPLOAD_COVER_PATH . $value['articalPhoto'],
+                        'fileName' => $value['articalPhoto']
+                    );
+                    $copy[] = $value;
+                }
+                self :: setContent(
+                    array('isSuccess' => true,
+                        'message' => '操作成功',
+                        'articalList' => $copy,
+                        'total' => $total
+                    )
+                );
+            } else {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '操作失败'
+                    )
+                );
+            }
+            self :: send();
+        }
+
+        public static function deleteArticalByCodeAction() {
+            $articalCode = $_GET['articalCode'];
+            // 从session中取出userCode userCode = $userCode;
+            if ($articalCode === null) {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '操作失败'
+                    )
+                );
+            } else {
+                $mysql = new Mysql($GLOBALS['config']);
+                $articalInfo = $mysql -> getRow("select * from articals where articalCode='$articalCode'");
+                $sql = "delete from articals where articalCode='$articalCode'";
+                if ($mysql -> query($sql)) {
+                    $fileNames = array();
+                    if ($articalInfo['articalType'] === '1') {
+                        $fileNames['content'] = explode(',', $articalInfo['articalImages']);
+                    }
+                    $fileNames['photo'] = $articalInfo['articalPhoto'];
+                    self :: deleteFilesByFileNameAction($fileNames);
+                    self :: setContent(
+                        array('isSuccess' => true,
                             'message' => '操作成功',
                         )
                     );
@@ -300,14 +389,31 @@
                         )
                     );
                 }
-            } else {
-                self :: setContent(
-                    array('isSuccess' => false,
-                        'message' => '操作失败',
-                    )
-                );
             }
             self :: send();
+        }
+
+        // 根据fileName 删除附件
+        public static function deleteFilesByFileNameAction($fileNames){
+            if (!$fileNames) {
+                return false;
+            }
+            $mysql = new Mysql($GLOBALS['config']);
+            foreach($fileNames as $key => $value) {
+                if ($key === 'content') {
+                    foreach($value as $fileName) {
+                        if ($mysql -> query("delete from files where fileName='$fileName'")) {
+                            $fileName = UPLOAD_CONTENT_PATH . $fileName;
+                            unlink($fileName);
+                        }
+                    }
+                } else if ($key === 'photo') {
+                    if ($mysql -> query("delete from files where fileName='$value'")) {
+                        $value = UPLOAD_PHOTO_PATH . $value;
+                        unlink($value);
+                    }  
+                }
+            }
         }
     }
 ?>

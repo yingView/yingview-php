@@ -1,19 +1,22 @@
 <?php
     class UserController extends Controller {
-        // 注册用户名
+        // 注册用户
         public static function registAction(){
-
             $userInfo = get_object_vars(json_decode($_GET['content']));
             $userInfo['userId'] = 'null';
             $userInfo['userCode'] = self::initCode();
             $userInfo['passCode'] = md5($userInfo['password']);
             $userInfo['tel'] = 'null';
             $userInfo['bithday'] = 'null';
-            $userInfo['photoImage'] = 'default_photo.jpg';
+            $userInfo['userPhoto'] = 'default_photo.jpg';
+            $userInfo['userBanner'] = 'default_photo.jpg';
             $userInfo['userLevel'] = 1;
             $userInfo['userPower'] = 1;
             $userInfo['userStatus'] = 0;
-            $userInfo['jobDesc'] = 'null';
+            $userInfo['sign'] = 'null';
+            $userInfo['description'] = 'null';
+            $userInfo['experience'] = 'null';
+            $userInfo['city'] = 'null';
             $userInfo['activeCode'] = self::initCode();
             $userInfo['userCreateTime'] = time();
             $sql = <<<heredoc
@@ -28,12 +31,16 @@
                 '$userInfo[email]',
                 $userInfo[tel],
                 $userInfo[bithday],
-                '$userInfo[photoImage]',
+                '$userInfo[userPhoto]',
+                '$userInfo[userBanner]',
                 $userInfo[userLevel],
                 $userInfo[userPower],
                 $userInfo[userStatus],
                 '$userInfo[userJob]',
-                '$userInfo[jobDesc]',
+                '$userInfo[sign]',
+                '$userInfo[description]',
+                '$userInfo[experience],
+                '$userInfo[city]',
                 '$userInfo[activeCode]',
                 $userInfo[userCreateTime]
             );
@@ -55,7 +62,7 @@ heredoc;
                                 'nickName' => $userInfo['nickName'],
                                 'userName' => $userInfo['userName'],
                                 'passCode' => $userInfo['passCode'],
-                                'photoImage' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['photoImage'],
+                                'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userPhoto'],
                                 'userCode' => $userInfo['userCode'],
                                 'userJob' => $userInfo['userJob']
                             )
@@ -160,16 +167,12 @@ MailContent;
                 return;
             }
             $mysql = new Mysql($GLOBALS['config']);
-            if ( $mysql -> getRow("select * from users where userName='$userName' and userStatus=0 and activeCode='$activeCode'")) {
-                $sql = "update users set activeCode=null,userStatus=1 where userName='$userName' and userStatus=0 and activeCode='$activeCode'";
-                if ($mysql -> query($sql)) {
-                    echo '激活成功';
-                } else {
-                    echo '激活失败！';
-                }
+            $sql = "update users set activeCode=null,userStatus=1 where userName='$userName' and userStatus=0 and activeCode='$activeCode'";
+            if ($mysql -> query($sql)) {
+                echo '激活成功';
             } else {
                 echo '激活失败！';
-            }    
+            }
         }
         // 用户登录
         public static function loginAction(){
@@ -206,7 +209,7 @@ MailContent;
                                 'nickName' => $userInfo['nickName'],
                                 'userName' => $userInfo['userName'],
                                 'passCode' => $userInfo['passCode'],
-                                'photoImage' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['photoImage'],
+                                'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userPhoto'],
                                 'userCode' => $userInfo['userCode'],
                                 'userJob' => $userInfo['userJob']
                             )
@@ -230,52 +233,124 @@ MailContent;
             }
         }
 
-        // 关注
-        public static function followAction(){
-            $followUserCode = $_GET['followUserCode'];
-            $visitorCode = $_GET['visitorCode'];
-            if ($followUserCode === $visitorCode) {
-                self :: setContent(
-                    array('isSuccess' => false,
-                        'message' => '你不能关注自己'
-                    )
-                );
-            } else {
-                $mysql = new Mysql($GLOBALS['config']);
-                $sql = "select * from userFollow where followUserCode='$followUserCode' and visitorCode='$visitorCode'";
-                if (!$mysql -> getAll($sql)) {
-                    $createDate = time();
-                    $followId = 'null';
-                    $followCode = self::initCode();
-                    $sql = "insert into userFollow values (
-                        $followId,
-                        '$followCode',
-                        '$followUserCode',
-                        '$visitorCode',
-                        $createDate
-                    )";
-                    if ($mysql -> query($sql)) {
-                        self :: setContent(
-                            array('isSuccess' => true,
-                            'message' => '操作成功'
-                            )
-                        );
-                    } else {
-                        self :: setContent(
-                            array('isSuccess' => true,
-                            'message' => '操作失败'
-                            )
-                        );
-                    }
-                } else {
-                    self :: setContent(
-                        array('isSuccess' => false,
-                        'message' => '你已经关注过该用户'
-                        )
+        public static function getUserInfoAction(){
+            $userCode = $_GET['userCode'];
+            $mysql = new Mysql($GLOBALS['config']);
+            $sql = "select * from users where userCode='$userCode'";
+            $userInfo = $mysql -> getRow($sql);
+            $focusList = array();
+            $allFocusList = $mysql -> getAll("select users.*, tmp.* from users, (select * from userFocus where byFocusUserCode='$userCode' order by createDate desc limit 0, 6) as tmp where users.userCode = tmp.focusUserCode");
+            if ($allFocusList) {
+                foreach( $allFocusList as $value ) {
+                    $focusList[] = array(
+                        'userCode' => $value['userCode'],
+                        'userName' => $value['userName'],
+                        'nickName' => $value['nickName'],
+                        'sax' => $value['sax'],
+                        'email' => $value['email'],
+                        'tel' => $value['tel'],
+                        'bithday' => $userInfo['bithday'],
+                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                        'userBanner' => FRONT_UPLOAD_PHOTO_PATH . $value['userBanner'],
+                        'userLevel' => $value['userLevel'],
+                        'userPower' => $value['userPower'],
+                        'userJob' => $value['userJob'],
+                        'sign' => $value['sign'],
+                        'description' => $value['description'],
+                        'experience' => $value['experience'],
+                        'city' => $userInfo['city'],
+                        'userCreateTime' => $value['userCreateTime'],
+                        'userStatus' => $value['userStatus'],
                     );
                 }
             }
+            if ($userInfo) {
+                self :: setContent(
+                    array('isSuccess' => true,
+                    'message' => '查询成功',
+                    'userInfo' => array(
+                        'userCode' => $userInfo['userCode'],
+                        'userName' => $userInfo['userName'],
+                        'nickName' => $userInfo['nickName'],
+                        'sax' => $userInfo['sax'],
+                        'email' => $userInfo['email'],
+                        'tel' => $userInfo['tel'],
+                        'bithday' => $userInfo['bithday'],
+                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userPhoto'],
+                        'userBanner' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userBanner'],
+                        'userLevel' => $userInfo['userLevel'],
+                        'userPower' => $userInfo['userPower'],
+                        'userJob' => $userInfo['userJob'],
+                        'sign' => $userInfo['sign'],
+                        'description' => $userInfo['description'],
+                        'experience' => $userInfo['experience'],
+                        'city' => $userInfo['city'],
+                        'userCreateTime' => $userInfo['userCreateTime'],
+                        'userStatus' => $userInfo['userStatus'],
+                        'articalsNum' => count($mysql -> getAll("select * from articals where userCode='$userCode'")),
+                        'fansNum' => count($mysql -> getAll("select * from userFocus where byFocusUserCode='$userCode'")),
+                        'popularity' => $mysql -> getAll("select sum(articalView) as 'popularity' from articals where userCode='$userCode'")[0]['popularity']
+                    ),
+                    'focusList' => $focusList
+                    )
+                );
+            } else {
+                self :: setContent(
+                    array('isSuccess' => false,
+                    'message' => '查询失败'
+                    )
+                );
+            }
             self :: send();
+        }
+        // 更新用户
+        public static function updateUserInfoAction(){
+            $userInfo = get_object_vars(json_decode($_GET['userInfo']));
+            $userCode = $userInfo['userCode'];
+            $userName = $userInfo['userName'];
+            $nickName = $userInfo['nickName'];
+            $sax = $userInfo['sax'];
+            $email = $userInfo['email'];
+            $tel = $userInfo['tel'] ? $userInfo['tel'] : 'null';
+            $bithday = $userInfo['bithday'] ? $userInfo['bithday'] : 'null';
+            $userJob = $userInfo['userJob'];
+            $sign = $userInfo['sign'];
+            $description = $userInfo['description'];
+            $experience = $userInfo['experience'];
+            $city = $userInfo['city'];
+            $mysql = new Mysql($GLOBALS['config']);
+            $sql = "update users set ";
+            $sql .= "userName='$userName', ";
+            $sql .= "nickName='$nickName', ";
+            $sql .= "sax=$sax, ";
+            $sql .= "email='$email', ";
+            $sql .= "tel=$tel, ";
+            $sql .= "bithday=$bithday, ";
+            $sql .= "userJob='$userJob', ";
+            $sql .= "sign='$sign', ";
+            $sql .= "description='$description', ";
+            $sql .= "experience='$experience', ";
+            $sql .= "city='$city' ";
+            $sql .= "where userCode='$userCode'";
+            if ($mysql -> query($sql)) {
+                self :: setContent(
+                    array('isSuccess' => true,
+                    'message' => '操作成功',
+                    'userInfo' => array(
+                        'nickName' => $nickName,
+                        'userName' => $userName,
+                        'userJob' => $userJob
+                    )
+                    )
+                );
+            } else {
+                self :: setContent(
+                    array('isSuccess' => false,
+                    'message' => '操作失败'
+                    )
+                );
+            }
+            self :: send(); 
         }
     }
 ?>

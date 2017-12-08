@@ -3,6 +3,8 @@ create database if not exists yingview charset utf8;
 
 show create database yingview;
 
+drop database yingview;
+
 use yingview;
 
 update tablename set column=123,column2=234 where 条件;
@@ -20,17 +22,25 @@ CREATE TABLE `users` ( /*用户*/
 	`email` varchar(32) NOT NULL,
 	`tel` char(11) DEFAULT NULL,
 	`bithday` int DEFAULT NULL,
-	`photoImage` varchar(72) DEFAULT NULL, /* md5(fileid).jpeg*/
+	`userPhoto` varchar(72) DEFAULT NULL, /* md5(fileid).jpeg*/
+	`userBanner` varchar(72) DEFAULT NULL, /* md5(fileid).jpeg*/
 	`userLevel` tinyint DEFAULT NULL,
 	`userPower` tinyint DEFAULT NULL,
 	`userStatus` tinyint DEFAULT NULL,
 	`userJob` varchar(16) DEFAULT NULL,
-	`jobDesc` varchar(64) DEFAULT NULL, /* 描述职业的一句话*/
+	`sign` varchar(64) DEFAULT NULL, /* 描述职业的一句话*/
+	`description` varchar(100) DEFAULT NULL, /* 关于我 */
+	`experience` varchar(1000) DEFAULT NULL, /* 个人履历 */
+	`city` varchar(30) DEFAULT NULL,
 	`activeCode` varchar(64) DEFAULT NULL,
 	`userCreateTime` int  DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `users` ADD unique(`userName`, `nickName`);
+
+alter table users add column experience varchar(1000) DEFAULT NULL after description;
+/* 注意，上面这个命令的意思是说添加addr列到user1这一列后面。如果想添加到第一列的话，可以用：*/
+alter table t1 add column addr varchar(20) not null first;
 
 drop table users;
 
@@ -66,18 +76,30 @@ SELECT * FROM navs;
 
 CREATE TABLE `files` ( /*附件*/
 	`fileId` int PRIMARY KEY AUTO_INCREMENT,
-	`filesCode` varchar(64) NOT NULL,
-	`filesName` varchar(70) NOT NULL,
+	`fileCode` varchar(64) NOT NULL,
+	`fileName` varchar(70) NOT NULL,
 	`type` TINYINT, /* 0 代表头像 1，代表封面，2、代表文章*/
 	`url` varchar(500) NOT NULL, /* 访问路径 */
 	`userCode` varchar(64) NOT NULL,
+	`subjectCode` varchar(64) DEFAULT NULL, /* 主体的Code   主体一般为文章*/
 	`filesMime` varchar(16),
 	`laseShowTime` int
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table files;
 
-CREATE TABLE `articals` ( /*文章*/
+/* 海报 */
+CREATE TABLE `banners` ( /*附件*/
+	`bannerId` int PRIMARY KEY AUTO_INCREMENT,
+	`bannerCode` varchar(64) NOT NULL,
+	`bannerDesc` varchar(70) NOT NULL,
+	`toUrl` varchar(200) NOT NULL, /* 访问路径 */
+	`imgUrl` varchar(200)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table banners;
+
+CREATE TABLE `articals` ( /* 文章 */
 	`articalId` int PRIMARY KEY AUTO_INCREMENT,
 	`articalCode` varchar(64) NOT NULL,
 	`articalTitle` varchar(60) NOT NULL,
@@ -115,6 +137,7 @@ CREATE TABLE `articalMarks` ( /*点赞列表*/
 	`createDate` int DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
 drop table articalMarks;
 
 CREATE TABLE `articalViews` ( /*查看列表*/
@@ -127,30 +150,41 @@ CREATE TABLE `articalViews` ( /*查看列表*/
 
 select * from articalViews;
 
-
 drop table articalViews;
 
-CREATE TABLE `userFollow` ( /*关注列表*/
-	`followId` int PRIMARY KEY AUTO_INCREMENT,
-	`followCode` varchar(64) NOT NULL,
-	`followUserCode` varchar(64) DEFAULT NULL, /*被关注人*/
-	`visitorCode` varchar(64) DEFAULT NULL,
+CREATE TABLE `userFocus` ( /*关注列表*/
+	`focusId` int PRIMARY KEY AUTO_INCREMENT,
+	`focusCode` varchar(64) NOT NULL,
+	`byFocusUserCode` varchar(64) DEFAULT NULL, /*被关注人*/
+	`focusUserCode` varchar(64) DEFAULT NULL, /* 关注人*/
 	`createDate` int DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-drop table userFollow;
+drop table userFocus;
 
 CREATE TABLE `emails` ( /*站内信*/
 	`emailId` int PRIMARY KEY AUTO_INCREMENT,
 	`emailCode` varchar(64) NOT NULL,
-	`sendUserCode` varchar(64) DEFAULT NULL, /*被关注人*/
-	`ReceiveUserCode` varchar(64) DEFAULT NULL,
-	`eamilTitle` varchar(100) DEFAULT NULL,
+	`sendUserCode` varchar(64) DEFAULT NULL, /*发件人人*/
+	`ReceiveUserCode` varchar(64) DEFAULT NULL, /* 收件人 */
+	`eamilTitle` varchar(40) DEFAULT NULL,
 	`eamilContent` varchar(2000) DEFAULT NULL,
+	`emailStatus` tinyint, /* 未读，已读, 草稿 0， 1， 2*/
 	`emailCreateDate` int DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table emails;
+
+-- CREATE TABLE `experiences` ( /*工作经历*/
+-- 	`experienceId` int PRIMARY KEY AUTO_INCREMENT,
+-- 	`experienceCode` varchar(64) NOT NULL,
+-- 	`userCode` varchar(64) DEFAULT NULL, /*发件人人*/
+-- 	`experienceStartTime` int DEFAULT 0, /* 收件人 */
+-- 	`experienceEndTime` int DEFAULT 0,
+-- 	`experienceContent` varchar(400) DEFAULT NULL, /* 工作描述 */
+-- 	`companyName` varchar(50) DEFAULT NULL,
+-- 	`experienceCreateDate` int DEFAULT 0
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `books` (  /* 专栏 */
 	`bookId` int PRIMARY KEY AUTO_INCREMENT,
@@ -162,8 +196,9 @@ CREATE TABLE `books` (  /* 专栏 */
 	`bookView` int DEFAULT 0,  /* 点击数 */
 	`bookMark` int DEFAULT 0,  /* 点赞数 */
 	`bookCommentNum` int DEFAULT 0, /* 评论数 */
+	`bookDesc` varchar(200) DEFAULT NULL, 
 	`bookCreateDate` int DEFAULT 0,
-	`bookStatus` tinyint /* 普通，新品，推荐，精品 0， 1， 2， 3*/
+	`bookStatus` tinyint /* 暂存，普通，新品，推荐，精品 0， 1， 2， 3, 4*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 insert into books values( null, 1 ,'首页', '/', 1, 0, 0, '_blank');
@@ -192,10 +227,9 @@ CREATE TABLE `comments` ( /*评论*/
 	`bookCode` varchar(64) NOT NULL,
 	`comContent` varchar(400), /*200字数*/
 	`comCreateDate` int,
-	`comParentType` tinyint, /* 主体是文章还是评论   0 ， 1 */
+	`comParentType` tinyint, /* 主体是文章、评论   0 ， 1 */
 	`comParentCode` varchar(64) NOT NULL, /* 主体 code */
-	`comMark` int DEFAULT NULL, /* 点赞数 */
-	`comCommentNum` int   /* 评论数 */
+	`comMark` int DEFAULT NULL /* 点赞数 */
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 drop table comments;

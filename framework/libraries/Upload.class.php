@@ -73,7 +73,7 @@ class Upload{
 					'mime' => explode('.', $filemime)[1],
 					'url' =>  FRONT_UPLOAD_PATH . $sub_path . $file_name,
 					// 'mineImage' => "/yingview.php?fileCode={$name}&method=miniImage",
-					'download' => "/yingview.php?fileCode={$name}&method=downLoad"
+					'download' => "/yingview.php?fileCode={$name}&method=downLoad&rpcname=file"
 				);
 			} else {
 				# 移动失败

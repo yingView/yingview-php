@@ -54,6 +54,9 @@
             define("PLATFORM", isset($_GET['p']) ? $_GET['p'] : 'front');
             define("CUR_CONTROLLER_PATH", CONTROLLER_PATH . PLATFORM . DS);
             define("UPLOAD_PATH", PUBLIC_PATH . 'uploads' . DS);
+            define("UPLOAD_COVER_PATH", UPLOAD_PATH . 'covers' . DS);
+            define("UPLOAD_CONTENT_PATH", UPLOAD_PATH . 'contents' . DS);
+            define("UPLOAD_PHOTO_PATH", UPLOAD_PATH . 'photos' . DS);
             define("FRONT_UPLOAD_PATH",  '/public/uploads' . DS);
             define("FRONT_UPLOAD_COVER_PATH", '/public/uploads/covers' . DS);
             define("FRONT_UPLOAD_CONTENT_PATH", '/public/uploads/contents' . DS);
