@@ -57,6 +57,7 @@
             define("UPLOAD_COVER_PATH", UPLOAD_PATH . 'covers' . DS);
             define("UPLOAD_CONTENT_PATH", UPLOAD_PATH . 'contents' . DS);
             define("UPLOAD_PHOTO_PATH", UPLOAD_PATH . 'photos' . DS);
+            define("UPLOAD_SYSTEM_PATH", UPLOAD_PATH . 'system' . DS);
             define("FRONT_UPLOAD_PATH",  '/public/uploads' . DS);
             define("FRONT_UPLOAD_COVER_PATH", '/public/uploads/covers' . DS);
             define("FRONT_UPLOAD_CONTENT_PATH", '/public/uploads/contents' . DS);

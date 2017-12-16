@@ -270,5 +270,62 @@
             }
             self :: send();
         }
+
+        public static function queryByBookCodeAction() {
+            $bookCode = $_GET['bookCode'];
+            $current = $_GET['current'];
+            $size = $_GET['size'];
+            $total = 0;
+            if ($current === null) {
+                $current = 1;
+            }
+            if ($size === null) {
+                $size = 10;
+            }
+            $mysql = new Mysql($GLOBALS['config']);
+            $current = ($current - 1) * $size;
+            $sql = "select comments.*, users.* from comments left join users on comments.userCode = users.userCode where comments.bookCode='$bookCode' and comParentType=2";
+            $total = count($mysql -> getAll($sql));
+            $sql . " limit $current ,$size";
+            $commentList = $mysql -> getAll($sql);
+            if ($commentList) {
+                $copy = array();
+                foreach( $commentList as $value) {
+                    $copy[] = array(
+                        'commentCode' => $value['commentCode'],
+                        'comContent' => $value['comContent'],
+                        'bookCode' => $value['bookCode'],
+                        'comCreateDate' => $value['comCreateDate'],
+                        'comParentType' => $value['comParentType'],
+                        'comParentCode' => $value['comParentCode'],
+                        'comMark' => $value['comMark'],
+                        'userCode' => $value['userCode'],
+                        'userName' => $value['userName'],
+                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                        'nickName' => $value['nickName'],
+                        'sax' => $value['sax'],
+                        'userLevel' => $value['userLevel'],
+                        'userJob' => $value['userJob'],
+                        'jobDesc' => $value['jobDesc'],
+                        'userJob' => $value['userJob'],
+                        'userJob' => $value['userJob']
+                    );
+                }
+                self :: setContent(
+                    array('isSuccess' => true,
+                        'message' => '操作成功',
+                        'commentList' => $copy,
+                        'total' => $total
+                    )
+                );
+            } else {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '操作失败',
+                    )
+                );
+            }
+            self :: send();
+        }
     }
 ?>

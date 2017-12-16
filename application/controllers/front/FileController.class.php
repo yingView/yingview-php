@@ -18,7 +18,10 @@
                 $folder = 'covers'; // 封面
             } else if ($_POST['type'] === '2') {
                 $folder = 'contents'; // 文章
+            } else if ($_POST['type'] === '3') {
+                $folder = 'system'; // 系统
             }
+
             $subjectCode = $_POST['subjectCode'];
             if ($subjectCode === null) {
                 $subjectCode = 0;
@@ -113,6 +116,8 @@
                     $fileName = UPLOAD_COVER_PATH . $fileName;
                 } else if ($type === '2') {
                     $fileName = UPLOAD_CONTENT_PATH . $fileName;
+                } else if ($type === '3') {
+                    $fileName = UPLOAD_SYSTEM_PATH . $fileName;
                 }
                 $fileinfo = pathinfo($fileName);
                 header('Content-type: application/x-'.$fileinfo['extension']);
@@ -143,6 +148,8 @@
                         $fileName = UPLOAD_COVER_PATH . $fileName;
                     } else if ($type === '2') {
                         $fileName = UPLOAD_CONTENT_PATH . $fileName;
+                    } else if ($type === '3') {
+                        $fileName = UPLOAD_SYSTEM_PATH . $fileName;
                     }
                     unlink($fileName);
                 }

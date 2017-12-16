@@ -17,7 +17,7 @@
             $articalCode = $articalInfo['articalCode'];
             $articalTitle = $articalInfo['articalTitle'];
             $userCode = $articalInfo['userCode'];
-            $categoryCode = $articalInfo['categoryCode'];
+            $categoryCode = $articalInfo['categoryCode'] ? $articalInfo['categoryCode'] : 'null';
             $articalContent = htmlspecialchars($articalInfo['articalContent']);
             $articalPhoto = $articalInfo['articalPhoto'];
             $articalImages = $articalInfo['articalImages'] ? $articalInfo['articalImages'] : 'null';
@@ -27,7 +27,7 @@
             $articalMark = 0;
             $articalCommentNum = 0;
             $articalStatus = $operate === 'submit' ? 1 : 0;
-            $bookId = $articalInfo['bookId'] ? $articalInfo['bookId'] : 0;
+            $bookCode = $articalInfo['bookCode'] ? $articalInfo['bookCode'] : 0;
             $sql = "";
             $mysql = new Mysql($GLOBALS['config']);
             if (!$articalCode) {
@@ -47,7 +47,7 @@
                     $articalMark,
                     $articalCommentNum,
                     $articalStatus,
-                    $bookId
+                    '$bookCode'
                 )";
             } else if ($articalCode) {
                 $articalCode = addslashes($articalCode);
@@ -62,7 +62,7 @@
                     articalCreateDate=$articalCreateDate,
                     articalType=$articalType,
                     articalStatus=$articalStatus,
-                    bookId=$bookId
+                    bookCode='$bookCode'
                 where 
                 articalCode='$articalCode'";
             }
@@ -210,6 +210,7 @@
                             'articalMark' => $artical['articalMark'],
                             'articalCommentNum' => $artical['articalCommentNum'],
                             'articalStatus' => $artical['articalStatus'],
+                            'bookCode' => $artical['bookCode'],
                             'userCode' => $artical['userCode'],
                             'userName' => $artical['userName'],
                             'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $artical['userPhoto'],
@@ -219,7 +220,8 @@
                             'userJob' => $artical['userJob'],
                             'jobDesc' => $artical['jobDesc'],
                             'userJob' => $artical['userJob'],
-                            'userJob' => $artical['userJob']
+                            'userJob' => $artical['userJob'],
+                            'bookName' => $mysql -> getRow("select * from books where bookCode='$artical[bookCode]'")['bookName']
                         )
                     )
                 );
@@ -330,6 +332,41 @@
             $total = count($mysql -> getAll($sql));
             $current = ($current - 1) * $size;
             $sql.=" limit $current ,$size";
+            $articalList = $mysql -> getAll($sql);
+            if ($articalList) {
+                $copy = array();
+                foreach($articalList as $key => $value) {
+                    $value['articalPhoto'] = array(
+                        'url' => FRONT_UPLOAD_COVER_PATH . $value['articalPhoto'],
+                        'fileName' => $value['articalPhoto']
+                    );
+                    $copy[] = $value;
+                }
+                self :: setContent(
+                    array('isSuccess' => true,
+                        'message' => '操作成功',
+                        'articalList' => $copy,
+                        'total' => $total
+                    )
+                );
+            } else {
+                self :: setContent(
+                    array('isSuccess' => false,
+                        'message' => '操作失败'
+                    )
+                );
+            }
+            self :: send();
+        }
+
+        public static function getArticalListByBookCodeAction() {
+            $bookCode = $_GET['bookCode'];
+            $self = $_GET['self'];
+            $mysql = new Mysql($GLOBALS['config']);
+            $sql = "select * from articals where bookCode='$bookCode' and articalType=2 ";
+            if ($self !== 'true') {
+                $sql .= "and articalStatus!=0";
+            }
             $articalList = $mysql -> getAll($sql);
             if ($articalList) {
                 $copy = array();

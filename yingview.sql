@@ -53,20 +53,19 @@ insert into users values( null, 'd253c5f077b52bc4a569172b7ac8789e', '121', '212'
 
 CREATE TABLE `navs` ( /*导航*/
 	`navId` int PRIMARY KEY AUTO_INCREMENT,
-	`navIndex` smallint NOT NULL,
+	`navIndex` tinyint NOT NULL,
 	`navName` varchar(12) NOT NULL,
 	`navUrl` varchar(32) NOT NULL,
-	`navStatus` tinyint NOT NULL,
-	`navLevel` tinyint NOT NULL,
-	`parentNavId` int NOT NULL,
-	`navTarget` varchar(8) NOT NULL
+	`parentId` int NOT NULL,
+	`navTarget` tinyint DEFAULT NULL /* 0 新页面 ， 1 当前页*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 ALTER TABLE `navs` ADD unique(`navName`);
 
-insert into navs values( null, 1, '首页', '/', 1, 0, 0, '_blank');
-insert into navs values( null, 1, '文章', 'artical', 1, 0, 0, '_blank');
-insert into navs values( null, 1, '热门', 'hot', 1, 0, 0, '_blank');
-insert into navs values( null, 1, '最新', 'new', 1, 0, 0, '_blank');
+insert into navs values( null, 1, '首页', '/', 0, 0);
+insert into navs values( null, 1, '文章', '/', 0, 0);
+insert into navs values( null, 1, '热门', '/', 0, 0);
+insert into navs values( null, 1, '最新', '/', 0, 0);
 
 drop table navs;
 
@@ -78,7 +77,7 @@ CREATE TABLE `files` ( /*附件*/
 	`fileId` int PRIMARY KEY AUTO_INCREMENT,
 	`fileCode` varchar(64) NOT NULL,
 	`fileName` varchar(70) NOT NULL,
-	`type` TINYINT, /* 0 代表头像 1，代表封面，2、代表文章*/
+	`type` TINYINT, /* 0 代表头像 1，代表封面，2、代表文章， 3、代表系统图片*/
 	`url` varchar(500) NOT NULL, /* 访问路径 */
 	`userCode` varchar(64) NOT NULL,
 	`subjectCode` varchar(64) DEFAULT NULL, /* 主体的Code   主体一般为文章*/
@@ -91,13 +90,25 @@ drop table files;
 /* 海报 */
 CREATE TABLE `banners` ( /*附件*/
 	`bannerId` int PRIMARY KEY AUTO_INCREMENT,
-	`bannerCode` varchar(64) NOT NULL,
-	`bannerDesc` varchar(70) NOT NULL,
-	`toUrl` varchar(200) NOT NULL, /* 访问路径 */
-	`imgUrl` varchar(200)
+	`toUrl` varchar(220) NOT NULL, /* 访问路径 */
+	`imgUrl` varchar(220)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+insert into banners values( null, '/', '/');
+
 drop table banners;
+
+CREATE TABLE `systems` ( /*系统设置*/
+	`id` int PRIMARY KEY AUTO_INCREMENT,
+	`name` VARCHAR(20) NOT NULL,
+	`host` VARCHAR(100) NOT NULL,
+	`desc` varchar(500) NOT NULL, /* 网站描述 */
+	`mark` varchar(20) NOT NULL, /* 网站描述 */
+	`logo` varchar(220) NOT NULL, /* 网站logo */
+	`logo2`  varchar(220) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table systems;
 
 CREATE TABLE `articals` ( /* 文章 */
 	`articalId` int PRIMARY KEY AUTO_INCREMENT,
@@ -105,7 +116,7 @@ CREATE TABLE `articals` ( /* 文章 */
 	`articalTitle` varchar(60) NOT NULL,
 	`userCode` varchar(64) DEFAULT NULL,
 	`categoryCode` varchar(64) DEFAULT NULL,
-	`articalContent` varchar(20000) DEFAULT NULL,
+	`articalContent` varchar(18000) DEFAULT NULL,
 	`articalPhoto` varchar(80) DEFAULT NULL, /* 封面图片 */
 	`articalImages` varchar(1500) DEFAULT NULL, /* 图片地址 */
 	`articalCreateDate` int DEFAULT 0, 
@@ -114,7 +125,7 @@ CREATE TABLE `articals` ( /* 文章 */
 	`articalMark` int DEFAULT 0,  /* 点赞数 */
 	`articalCommentNum` int DEFAULT 0, /* 评论数 */
 	`articalStatus` tinyint DEFAULT 0, /* 0，保存，1，发布，状态为2则为精品*/
-	`bookId` int DEFAULT NULL /* 专栏id 专栏文章photo和type取book得photo和type*/
+	`bookCode` varchar(64) DEFAULT NULL /* 专栏id 专栏文章photo和type取book得photo和type*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 insert into articals values(null,'2123131233213','测试', 1,1,13123123,'http://127.0.0.1:8080/files/23D31E0AAE3D4EC9BD46B66F71961A82.jpg',null,14212331343543,'artical', 143,4536,3321,1, 1);
@@ -166,7 +177,7 @@ CREATE TABLE `emails` ( /*站内信*/
 	`emailId` int PRIMARY KEY AUTO_INCREMENT,
 	`emailCode` varchar(64) NOT NULL,
 	`sendUserCode` varchar(64) DEFAULT NULL, /*发件人人*/
-	`ReceiveUserCode` varchar(64) DEFAULT NULL, /* 收件人 */
+	`receiveUserCode` varchar(64) DEFAULT NULL, /* 收件人 */
 	`eamilTitle` varchar(40) DEFAULT NULL,
 	`eamilContent` varchar(2000) DEFAULT NULL,
 	`emailStatus` tinyint, /* 未读，已读, 草稿 0， 1， 2*/
@@ -227,7 +238,7 @@ CREATE TABLE `comments` ( /*评论*/
 	`bookCode` varchar(64) NOT NULL,
 	`comContent` varchar(400), /*200字数*/
 	`comCreateDate` int,
-	`comParentType` tinyint, /* 主体是文章、评论   0 ， 1 */
+	`comParentType` tinyint, /* 主体是文章、评论, 专栏   0 ， 1,  2*/
 	`comParentCode` varchar(64) NOT NULL, /* 主体 code */
 	`comMark` int DEFAULT NULL /* 点赞数 */
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
