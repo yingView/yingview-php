@@ -24,6 +24,7 @@
         public static function editNavAction(){
             $mysql = new Mysql($GLOBALS['config']);
             $navList = $_GET['navList'];
+            $navList = str_replace("\\","",$navList);
             $navList = json_decode($navList);
             
             if ($navList) {

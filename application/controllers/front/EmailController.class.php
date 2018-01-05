@@ -59,6 +59,7 @@
         public static function deleteEmailAction() {
             $emailCodes = $_GET['emailCodes'];
             if ($emailCodes) {
+                $emailCodes = str_replace("\\","",$emailCodes);
                 $emailCodes = json_decode($emailCodes);
                 $mysql = new Mysql($GLOBALS['config']);
                 $sql = "delete from emails where emailCode in (";

@@ -2,7 +2,9 @@
     class UserController extends Controller {
         // 注册用户
         public static function registAction(){
-            $userInfo = get_object_vars(json_decode($_GET['content']));
+            $content = $_GET['content'];
+            $content = str_replace("\\","",$content);
+            $userInfo = get_object_vars(json_decode($content));
             $userInfo['userId'] = 'null';
             $userInfo['userCode'] = self::initCode();
             $userInfo['passCode'] = md5($userInfo['password']);
@@ -39,7 +41,7 @@
                 '$userInfo[userJob]',
                 '$userInfo[sign]',
                 '$userInfo[description]',
-                '$userInfo[experience],
+                '$userInfo[experience]',
                 '$userInfo[city]',
                 '$userInfo[activeCode]',
                 $userInfo[userCreateTime]
@@ -265,6 +267,8 @@ MailContent;
                 }
             }
             if ($userInfo) {
+                $popularity = $mysql -> getAll("select sum(articalView) as 'popularity' from articals where userCode='$userCode'");
+                $popularity = $popularity[0];
                 self :: setContent(
                     array('isSuccess' => true,
                     'message' => '查询成功',
@@ -289,7 +293,7 @@ MailContent;
                         'userStatus' => $userInfo['userStatus'],
                         'articalsNum' => count($mysql -> getAll("select * from articals where userCode='$userCode'")),
                         'fansNum' => count($mysql -> getAll("select * from userFocus where byFocusUserCode='$userCode'")),
-                        'popularity' => $mysql -> getAll("select sum(articalView) as 'popularity' from articals where userCode='$userCode'")[0]['popularity']
+                        'popularity' => $popularity['popularity']
                     ),
                     'focusList' => $focusList
                     )
@@ -305,7 +309,9 @@ MailContent;
         }
         // 更新用户
         public static function updateUserInfoAction(){
-            $userInfo = get_object_vars(json_decode($_GET['userInfo']));
+            $userInfo = $_GET['userInfo'];
+            $userInfo = str_replace("\\","",$userInfo);
+            $userInfo = get_object_vars(json_decode($userInfo));
             $userCode = $userInfo['userCode'];
             $userName = $userInfo['userName'];
             $nickName = $userInfo['nickName'];

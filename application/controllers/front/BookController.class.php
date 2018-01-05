@@ -12,7 +12,9 @@
                 return;
             }
             $operate = $_GET['operate'];
-            $bookInfo = get_object_vars(json_decode($_GET['content']));
+            $content = $_GET['content'];
+            $content = str_replace("\\","",$content);
+            $bookInfo = get_object_vars(json_decode($content));
             $bookId = 'null';
             $bookCode = $bookInfo['bookCode'];
             $bookPhoto = $bookInfo['bookPhoto'];
@@ -45,7 +47,8 @@
                 )";
             } else if ($bookCode) {
                 $bookCode = addslashes($bookCode);
-                $time = $mysql -> getRow("select * from books where bookCode='$bookCode'")['bookCreateDate'];
+                $time = $mysql -> getRow("select * from books where bookCode='$bookCode'");
+                $time = $time['bookCreateDate'];
                 $bookCreateDate = $time ? $time : time();
                 $sql = "update books set 
                 bookPhoto='$bookPhoto',
@@ -134,6 +137,7 @@
                 $mysql = new Mysql($GLOBALS['config']);
                 $bookInfo = $mysql -> getRow("select books.*, users.* from books left join users on books.userCode = users.userCode where bookCode='$bookCode'");
                 if ($bookInfo) {
+                    $bookView = $mysql -> getRow("select sum(articalView) as 'view', sum(articalMark) as 'mark' from articals where bookCode='$bookCode' and articalType=2 and articalStatus!=0");
                     self :: setContent(
                         array('isSuccess' => true,
                             'message' => '操作成功',
@@ -145,8 +149,8 @@
                                     'url' => FRONT_UPLOAD_COVER_PATH . $bookInfo['bookPhoto'],
                                     'fileName' => $bookInfo['bookPhoto']
                                 ),
-                                'bookView' => $mysql -> getRow("select sum(articalView) as 'view' from articals where bookCode='$bookCode' and articalType=2 and articalStatus!=0")['view'],
-                                'bookMark' => $mysql -> getRow("select sum(articalMark) as 'mark' from articals where bookCode='$bookCode' and articalType=2 and articalStatus!=0")['mark'],
+                                'bookView' => $bookView['view'],
+                                'bookMark' => $bookView['mark'],
                                 'bookCommentNum' => $bookInfo['bookCommentNum'],
                                 'bookDesc' => $bookInfo['bookDesc'],
                                 'bookCreateDate' => $bookInfo['bookCreateDate'],

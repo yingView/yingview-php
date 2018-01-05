@@ -26,6 +26,7 @@
             $sql = "delete from systems";
             $system = $mysql -> query($sql);
             $system = $_GET['system'];
+            $system = str_replace("\\","",$system);
             $system = json_decode($system);
             $system = get_object_vars($system);
             $sql = "insert into systems values(null, '$system[name]', '$system[host]', '$system[desc]', '$system[mark]', '$system[logo]', '$system[logo2]')";
@@ -69,6 +70,7 @@
         public static function editBannerAction(){
             $mysql = new Mysql($GLOBALS['config']);
             $bannerList = $_GET['bannerList'];
+            $bannerList = str_replace("\\","",$bannerList);
             $bannerList = json_decode($bannerList);
             if ($bannerList) {
                 $sql = "delete from banners";

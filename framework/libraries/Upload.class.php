@@ -67,10 +67,11 @@ class Upload{
 			//准备就绪了，开始上传
 			if (move_uploaded_file($file['tmp_name'], $this->path . $sub_path . $file_name)) {
 				# 移动成功
+				$mime = explode('.', $filemime);
 				return array(
 					'fileCode' => $name,
 					'fileName' => $file_name,
-					'mime' => explode('.', $filemime)[1],
+					'mime' => $mime[1],
 					'url' =>  FRONT_UPLOAD_PATH . $sub_path . $file_name,
 					// 'mineImage' => "/yingview.php?fileCode={$name}&method=miniImage",
 					'download' => "/yingview.php?fileCode={$name}&method=downLoad&rpcname=file"

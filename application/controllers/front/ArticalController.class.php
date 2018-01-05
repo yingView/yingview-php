@@ -12,7 +12,9 @@
                 return;
             }
             $operate = $_GET['operate'];
-            $articalInfo = get_object_vars(json_decode($_GET['content']));
+            $content = $_GET['content'];
+            $content = str_replace("\\","",$content);
+            $articalInfo = get_object_vars(json_decode($content));
             $articalId = 'null';
             $articalCode = $articalInfo['articalCode'];
             $articalTitle = $articalInfo['articalTitle'];
@@ -51,7 +53,8 @@
                 )";
             } else if ($articalCode) {
                 $articalCode = addslashes($articalCode);
-                $time = $mysql -> getRow("select * from articals where articalCode='$articalCode'")['articalCreateDate'];
+                $time = $mysql -> getRow("select * from articals where articalCode='$articalCode'");
+                $time = $time['articalCreateDate'];
                 $articalCreateDate = $time ? $time : time();
                 $sql = "update articals set 
                     articalTitle='$articalTitle',
@@ -184,13 +187,15 @@
                 $articalImages = array();
                 if ($artical['articalImages']) {
                     foreach( explode(',', $artical['articalImages']) as $value) {
+                        $fileCode = explode('.', $value);
                         $articalImages[] = array(
                             'viewAdd' => FRONT_UPLOAD_CONTENT_PATH . $value,
                             'fileName' => $value,
-                            'fileCode' => explode('.', $value)[0]
+                            'fileCode' => $fileCode[0]
                         );
                     }
                 }
+                $bookName = $mysql -> getRow("select * from books where bookCode='$artical[bookCode]'");
                 self :: setContent(
                     array('isSuccess' => true,
                         'message' => '操作成功',
@@ -221,7 +226,7 @@
                             'jobDesc' => $artical['jobDesc'],
                             'userJob' => $artical['userJob'],
                             'userJob' => $artical['userJob'],
-                            'bookName' => $mysql -> getRow("select * from books where bookCode='$artical[bookCode]'")['bookName']
+                            'bookName' => $bookName['bookName']
                         )
                     )
                 );

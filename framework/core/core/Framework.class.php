@@ -9,9 +9,13 @@
             session_start();
             // 关闭警告
             error_reporting(0);
+            echo 1;
             self :: init();
+            echo 2;
             self :: autoload();
-            self :: dispatch();
+            echo 3;
+            $this -> dispatch();
+            echo 4;
         }
 
         private static function dispatch() {
@@ -33,11 +37,9 @@
             }
         }
         private static function init() {
-
             foreach( $_POST as $key => $value) {
                 $_GET[$key] = $value;
             };
-
             define("DS", DIRECTORY_SEPARATOR);
             define("ROOT", getcwd() . DS);
             define("APP_PATH", ROOT . 'application' . DS);
@@ -62,31 +64,34 @@
             define("FRONT_UPLOAD_COVER_PATH", '/public/uploads/covers' . DS);
             define("FRONT_UPLOAD_CONTENT_PATH", '/public/uploads/contents' . DS);
             define("FRONT_UPLOAD_PHOTO_PATH", '/public/uploads/photos' . DS);
- 
             // 设置跨域
             header('Access-Control-Allow-Origin:*');
             // 设置编码
             header("Content-type: text/html; charset=utf-8");
             // 引入基础控制器
             include CORE_PATH . 'Controller.class.php';
-
+            echo 4;
             // 引入数据库基础模型
             include CORE_PATH . 'Model.class.php';
             // 邮件发送
+            echo 4;
             include LIB_PATH . 'Mail.class.php';
             // 上传附件
+            echo LIB_PATH;
             include LIB_PATH . 'Upload.class.php';
             // 缩略图和水印
+            echo 6;
             include LIB_PATH . 'Image.class.php';
             // 添加验证码
+            echo 4;
             include LIB_PATH . 'Captcha.class.php';
 
             // 载入数据库配置项
-
+            echo 5;
             $GLOBALS['config'] = include CONFIG_PATH . 'config.php';
             $GLOBALS['mailconfig'] = include CONFIG_PATH . 'mailconfig.php';
             include DB_PATH . 'Mysql.class.php';
-
+            echo 6;
         }
     }
 ?>
