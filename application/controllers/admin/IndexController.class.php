@@ -4,6 +4,28 @@
             $mysql = new Mysql($GLOBALS['config']);
             $sql = "select * from systems";
             $system = $mysql -> getRow($sql);
+            if ($system['logo']) {
+                $fileArray = explode('/', $system['logo']);
+                $fileName = $fileArray[count($fileArray) - 1];
+                $fileCode = explode('.', $fileName);
+                $system['logo'] = array(
+                    'viewAdd' => $system['logo'],
+                    'fileName' => $fileName,
+                    'fileCode' => $fileCode[0],
+                    'download' => "/yingview.php?fileCode={$fileCode[0]}&method=downLoad&rpcname=file"
+                );
+            };
+            if ($system['logo2']) {
+                $fileArray = explode('/', $system['logo2']);
+                $fileName = $fileArray[count($fileArray) - 1];
+                $fileCode = explode('.', $fileName);
+                $system['logo2'] = array(
+                    'viewAdd' => $system['logo2'],
+                    'fileName' => $fileName,
+                    'fileCode' => $fileCode[0],
+                    'download' => "/yingview.php?fileCode={$fileCode[0]}&method=downLoad&rpcname=file"
+                );
+            };
             if ( $system ) {
                 self :: setContent(
                     array('isSuccess' => true,
@@ -29,7 +51,7 @@
             $system = str_replace("\\","",$system);
             $system = json_decode($system);
             $system = get_object_vars($system);
-            $sql = "insert into systems values(null, '$system[name]', '$system[host]', '$system[desc]', '$system[mark]', '$system[logo]', '$system[logo2]')";
+            $sql = "insert into systems values(null, '$system[name]', '$system[host]', '$system[desc]', '$system[markLeft]','$system[markRight]', '$system[logo]', '$system[logo2]')";
             if ($mysql -> query($sql)) {
                 self :: setContent(
                     array('isSuccess' => true,

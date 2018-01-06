@@ -64,7 +64,7 @@
             define("FRONT_UPLOAD_PHOTO_PATH", '/public/uploads/photos' . DS);
  
             // 设置跨域
-            header('Access-Control-Allow-Origin:*');
+            // header('Access-Control-Allow-Origin:*');
             // 设置编码
             header("Content-type: text/html; charset=utf-8");
             // 引入基础控制器

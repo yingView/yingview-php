@@ -25,8 +25,8 @@ CREATE TABLE `users` ( /*用户*/
 	`userPhoto` varchar(72) DEFAULT NULL, /* md5(fileid).jpeg*/
 	`userBanner` varchar(72) DEFAULT NULL, /* md5(fileid).jpeg*/
 	`userLevel` tinyint DEFAULT NULL,
-	`userPower` tinyint DEFAULT NULL,
-	`userStatus` tinyint DEFAULT NULL,
+	`userPower` tinyint DEFAULT NULL, /* 1 普通会员1，2 普通会员2 3 普通会员3 4 vip会员1 5 vip会员2 6 管理员1 7 管理员2 8 高级管理 9 超级管理员*/
+	`userStatus` tinyint DEFAULT NULL, /* 0 未激活，1 已激活， 2 短期黑名单 3 长期黑名单*/
 	`userJob` varchar(16) DEFAULT NULL,
 	`sign` varchar(64) DEFAULT NULL, /* 描述职业的一句话*/
 	`description` varchar(100) DEFAULT NULL, /* 关于我 */
@@ -103,7 +103,8 @@ CREATE TABLE `systems` ( /*系统设置*/
 	`name` VARCHAR(20) NOT NULL,
 	`host` VARCHAR(100) NOT NULL,
 	`desc` varchar(500) NOT NULL, /* 网站描述 */
-	`mark` varchar(20) NOT NULL, /* 网站描述 */
+	`markLeft` varchar(20) NOT NULL, /* 底部标记描述 */
+	`markRight` varchar(20) NOT NULL, /* 底部标记描述 */
 	`logo` varchar(220) NOT NULL, /* 网站logo */
 	`logo2`  varchar(220) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -221,7 +222,7 @@ CREATE TABLE `categorys` (  /*分类*/
 	`categoryCode` varchar(64) NOT NULL,
 	`categoryName` varchar(40) NOT NULL,
 	`parentCategoryId` int,
-	`categoryStatus` tinyint
+	`categoryStatus` tinyint /* 0 无效 1 有效*/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 insert into categorys values( null, "1", '分类1', 0, 1);
