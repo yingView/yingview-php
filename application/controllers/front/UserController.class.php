@@ -10,8 +10,8 @@
             $userInfo['passCode'] = md5($userInfo['password']);
             $userInfo['tel'] = 'null';
             $userInfo['bithday'] = 'null';
-            $userInfo['userPhoto'] = 'default_photo.jpg';
-            $userInfo['userBanner'] = 'default_photo.jpg';
+            $userInfo['userPhoto'] = FRONT_UPLOAD_PHOTO_PATH . 'default_photo.jpg';
+            $userInfo['userBanner'] = FRONT_UPLOAD_PHOTO_PATH . 'default_photo.jpg';
             $userInfo['userLevel'] = 1;
             $userInfo['userPower'] = 1;
             $userInfo['userStatus'] = 0;
@@ -64,9 +64,12 @@ heredoc;
                                 'nickName' => $userInfo['nickName'],
                                 'userName' => $userInfo['userName'],
                                 'passCode' => $userInfo['passCode'],
-                                'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userPhoto'],
+                                'userPhoto' => $userInfo['userPhoto'],
                                 'userCode' => $userInfo['userCode'],
-                                'userJob' => $userInfo['userJob']
+                                'userJob' => $userInfo['userJob'],
+                                'userPower' => $userInfo['userPower'],
+                                'userStatus' => $userInfo['userStatus'],
+                                'userLevel' => $userInfo['userLevel']
                             )
                         )
                     );
@@ -211,9 +214,12 @@ MailContent;
                                 'nickName' => $userInfo['nickName'],
                                 'userName' => $userInfo['userName'],
                                 'passCode' => $userInfo['passCode'],
-                                'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userPhoto'],
+                                'userPhoto' => $userInfo['userPhoto'],
                                 'userCode' => $userInfo['userCode'],
-                                'userJob' => $userInfo['userJob']
+                                'userJob' => $userInfo['userJob'],
+                                'userPower' => $userInfo['userPower'],
+                                'userStatus' => $userInfo['userStatus'],
+                                'userLevel' => $userInfo['userLevel']
                             )
                         )
                     );
@@ -252,8 +258,8 @@ MailContent;
                         'email' => $value['email'],
                         'tel' => $value['tel'],
                         'bithday' => $userInfo['bithday'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
-                        'userBanner' => FRONT_UPLOAD_PHOTO_PATH . $value['userBanner'],
+                        'userPhoto' => $value['userPhoto'],
+                        'userBanner' => $value['userBanner'],
                         'userLevel' => $value['userLevel'],
                         'userPower' => $value['userPower'],
                         'userJob' => $value['userJob'],
@@ -280,8 +286,8 @@ MailContent;
                         'email' => $userInfo['email'],
                         'tel' => $userInfo['tel'],
                         'bithday' => $userInfo['bithday'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userPhoto'],
-                        'userBanner' => FRONT_UPLOAD_PHOTO_PATH . $userInfo['userBanner'],
+                        'userPhoto' => $userInfo['userPhoto'],
+                        'userBanner' => $userInfo['userBanner'],
                         'userLevel' => $userInfo['userLevel'],
                         'userPower' => $userInfo['userPower'],
                         'userJob' => $userInfo['userJob'],
@@ -345,7 +351,10 @@ MailContent;
                     'userInfo' => array(
                         'nickName' => $nickName,
                         'userName' => $userName,
-                        'userJob' => $userJob
+                        'userJob' => $userJob,
+                        'userPower' => $userInfo['userPower'],
+                        'userStatus' => $userInfo['userStatus'],
+                        'userLevel' => $userInfo['userLevel']
                     )
                     )
                 );

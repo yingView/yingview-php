@@ -157,14 +157,12 @@
                                 'bookStatus' => $bookInfo['bookStatus'],
                                 'userCode' => $bookInfo['userCode'],
                                 'userName' => $bookInfo['userName'],
-                                'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $bookInfo['userPhoto'],
+                                'userPhoto' => $bookInfo['userPhoto'],
                                 'nickName' => $bookInfo['nickName'],
                                 'sax' => $bookInfo['sax'],
                                 'userLevel' => $bookInfo['userLevel'],
                                 'userJob' => $bookInfo['userJob'],
-                                'jobDesc' => $bookInfo['jobDesc'],
-                                'userJob' => $bookInfo['userJob'],
-                                'userJob' => $bookInfo['userJob']
+                                'jobDesc' => $bookInfo['jobDesc']
                             )
                         )
                     );

@@ -170,7 +170,7 @@
                         'comMark' => $value['comMark'],
                         'userCode' => $value['userCode'],
                         'userName' => $value['userName'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                        'userPhoto' => $value['userPhoto'],
                         'nickName' => $value['nickName'],
                         'sax' => $value['sax'],
                         'userLevel' => $value['userLevel'],
@@ -194,14 +194,12 @@
                             'comMark' => $value['comMark'],
                             'userCode' => $value['userCode'],
                             'userName' => $value['userName'],
-                            'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                            'userPhoto' => $value['userPhoto'],
                             'nickName' => $value['nickName'],
                             'sax' => $value['sax'],
                             'userLevel' => $value['userLevel'],
                             'userJob' => $value['userJob'],
-                            'jobDesc' => $value['jobDesc'],
-                            'userJob' => $value['userJob'],
-                            'userJob' => $value['userJob']
+                            'jobDesc' => $value['jobDesc']
                         );
                     }
                 }
@@ -301,14 +299,12 @@
                         'comMark' => $value['comMark'],
                         'userCode' => $value['userCode'],
                         'userName' => $value['userName'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                        'userPhoto' => $value['userPhoto'],
                         'nickName' => $value['nickName'],
                         'sax' => $value['sax'],
                         'userLevel' => $value['userLevel'],
                         'userJob' => $value['userJob'],
-                        'jobDesc' => $value['jobDesc'],
-                        'userJob' => $value['userJob'],
-                        'userJob' => $value['userJob']
+                        'jobDesc' => $value['jobDesc']
                     );
                 }
                 self :: setContent(

@@ -166,14 +166,12 @@
                     'articalStatus' => $artical['articalStatus'],
                     'userCode' => $artical['userCode'],
                     'userName' => $artical['userName'],
-                    'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $artical['userPhoto'],
+                    'userPhoto' => $artical['userPhoto'],
                     'nickName' => $artical['nickName'],
                     'sax' => $artical['sax'],
                     'userLevel' => $artical['userLevel'],
                     'userJob' => $artical['userJob'],
-                    'jobDesc' => $artical['jobDesc'],
-                    'userJob' => $artical['userJob'],
-                    'userJob' => $artical['userJob']
+                    'jobDesc' => $artical['jobDesc']
                 );
             };
             return array('articalList' => $articalList, 'total' => $total, 'current' => $current + 1, 'size' => $size);
@@ -218,14 +216,12 @@
                             'bookCode' => $artical['bookCode'],
                             'userCode' => $artical['userCode'],
                             'userName' => $artical['userName'],
-                            'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $artical['userPhoto'],
+                            'userPhoto' => $artical['userPhoto'],
                             'nickName' => $artical['nickName'],
                             'sax' => $artical['sax'],
                             'userLevel' => $artical['userLevel'],
                             'userJob' => $artical['userJob'],
                             'jobDesc' => $artical['jobDesc'],
-                            'userJob' => $artical['userJob'],
-                            'userJob' => $artical['userJob'],
                             'bookName' => $bookName['bookName']
                         )
                     )

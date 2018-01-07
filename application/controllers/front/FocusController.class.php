@@ -112,9 +112,12 @@
                         'nickName' => $value['nickName'],
                         'sax' => $value['sax'],
                         'email' => $value['email'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                        'userPhoto' => $value['userPhoto'],
                         'userJob' => $value['userJob'],
-                        'city' => $value['city']
+                        'city' => $value['city'],
+                        'userPower' => $userInfo['userPower'],
+                        'userStatus' => $userInfo['userStatus'],
+                        'userLevel' => $userInfo['userLevel']
                     );
                 }
                 self :: setContent(
@@ -168,9 +171,12 @@
                         'nickName' => $value['nickName'],
                         'sax' => $value['sax'],
                         'email' => $value['email'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'],
+                        'userPhoto' => $value['userPhoto'],
                         'userJob' => $value['userJob'],
-                        'city' => $value['city']
+                        'city' => $value['city'],
+                        'userPower' => $userInfo['userPower'],
+                        'userStatus' => $userInfo['userStatus'],
+                        'userLevel' => $userInfo['userLevel']
                     );
                 }
                 self :: setContent(

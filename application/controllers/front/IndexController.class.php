@@ -32,7 +32,7 @@
                         'articalTitle' => $artical['articalTitle'],
                         'categoryCode' => $artical['categoryCode'],
                         'articalContent' => $artical['articalContent'],
-                        'articalPhoto' => FRONT_UPLOAD_COVER_PATH . $artical['articalPhoto'],
+                        'articalPhoto' => $artical['articalPhoto'],
                         'articalImages' => $artical['articalImages'],
                         'articalCreateDate' => $artical['articalCreateDate'],
                         'articalType' => $artical['articalType'],
@@ -42,14 +42,14 @@
                         'articalStatus' => $artical['articalStatus'],
                         'userCode' => $artical['userCode'],
                         'userName' => $artical['userName'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $artical['userPhoto'],
+                        'userPhoto' => $artical['userPhoto'],
                         'nickName' => $artical['nickName'],
                         'sax' => $artical['sax'],
                         'userLevel' => $artical['userLevel'],
                         'userJob' => $artical['userJob'],
                         'jobDesc' => $artical['jobDesc'],
-                        'userJob' => $artical['userJob'],
-                        'userJob' => $artical['userJob']
+                        'userPower' => $userInfo['userPower'],
+                        'userStatus' => $userInfo['userStatus']
                     );
                 };
                 self :: setContent(

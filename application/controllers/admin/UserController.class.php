@@ -33,9 +33,9 @@
             $sql.=" limit $current ,$size";
             $userList = $mysql -> getAll($sql);
             if ($userList) {
-                $copy = [];
+                $copy = array();
                 foreach( $userList as $value) {
-                    $value['userPhoto'] = FRONT_UPLOAD_PHOTO_PATH . $value['userPhoto'];
+                    $value['userPhoto'] = $value['userPhoto'];
                     $copy[] = $value;
                 }
                 self :: setContent(

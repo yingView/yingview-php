@@ -179,7 +179,7 @@
                         'nickName' => $emails['nickName'],
                         'sax' => $emails['sax'],
                         'userJob' => $emails['userJob'],
-                        'userPhoto' => FRONT_UPLOAD_PHOTO_PATH . $emails['userPhoto'],
+                        'userPhoto' => $emails['userPhoto'],
                         'userLevel' => $emails['userLevel'],
                         'eamilContent' => $emails['eamilContent'],
                         'eamilTitle' => $emails['eamilTitle'],

@@ -2,7 +2,7 @@
     class Framework {
         public static function run() {
             // 设置主机名字
-            // $GLOBALS['localhost'] = 'http://127.0.0.1';
+            $GLOBALS['localhost'] = 'http://www.yingview.com/';
             // 设置时区;
             ini_set('date.timezone','Asia/Shanghai');
             // 开启session
